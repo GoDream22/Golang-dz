@@ -29,7 +29,7 @@ func main() {
 
 	for {
 		var err error
-		quantity, err = getQuantutyFirstCurrency()
+		quantity, err = getQuantityFirstCurrency()
 		if err != nil {
 			fmt.Println(err)
 		} else {
@@ -38,11 +38,11 @@ func main() {
 		}
 	}
 
-	availableSecondCurrency(currencyMap)
+	availableSecondCurrency(&currencyMap)
 
 	for {
 		var err error
-		currency2, err = getSecondCurrency(currencyMap)
+		currency2, err = getSecondCurrency(&currencyMap)
 		if err != nil {
 			fmt.Println(err)
 		} else {
@@ -79,7 +79,7 @@ func getFirstCurrency() (map[string]float64, error) {
 	}
 }
 
-func getQuantutyFirstCurrency() (float64, error) {
+func getQuantityFirstCurrency() (float64, error) {
 	var inputQuantity float64
 	err := errors.New("Количество валюты введено с ошибкой")
 	fmt.Print("Введите количество конвертируемой валюты: ")
@@ -90,19 +90,19 @@ func getQuantutyFirstCurrency() (float64, error) {
 	return inputQuantity, nil
 }
 
-func availableSecondCurrency(currencyMap map[string]float64) {
-	for currency, _ := range currencyMap {
+func availableSecondCurrency(currencyMap *map[string]float64) {
+	for currency, _ := range *currencyMap {
 		fmt.Println("Доступна валюта: ", currency)
 	}
 }
 
-func getSecondCurrency(currencyMap map[string]float64) (string, error) {
+func getSecondCurrency(currencyMap *map[string]float64) (string, error) {
 	var input2 string
 	err := errors.New("Получаемая валюта введена с ошибкой")
 	fmt.Print("Введите валюту, которую хотите получить: ")
 	fmt.Scan(&input2)
 	input2 = strings.ToLower(input2)
-	for currency, _ := range currencyMap {
+	for currency, _ := range *currencyMap {
 		if input2 == currency {
 			return input2, nil
 		}
