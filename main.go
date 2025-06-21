@@ -8,28 +8,25 @@ import (
 	"strings"
 )
 
-var currency1 string
-var currency2 string
-var quantity float64
-
-const usdToEur = 0.8955
-const usdToRub = 80.77
-const eurTorub = usdToRub / usdToEur
-
 func main() {
 	fmt.Println("___Конвертер валют___")
 	fmt.Println("Доступные валюты: usd, eur, rub")
 
+	currencyMap := map[string]float64{}
+	var currency2 string
+	var quantity float64
+	var convertionResult float64
+
 	for {
 		var err error
-		currency1, err = getFirstCurrency()
+		currencyMap, err = getFirstCurrency()
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			fmt.Println("Валюта 1:", currency1)
 			break
 		}
 	}
+
 	for {
 		var err error
 		quantity, err = getQuantutyFirstCurrency()
@@ -41,11 +38,11 @@ func main() {
 		}
 	}
 
-	fmt.Println(availableSecondCurrency(currency1))
+	availableSecondCurrency(currencyMap)
 
 	for {
 		var err error
-		currency2, err = getSecondCurrency()
+		currency2, err = getSecondCurrency(currencyMap)
 		if err != nil {
 			fmt.Println(err)
 		} else {
@@ -54,24 +51,31 @@ func main() {
 		}
 	}
 
-	fmt.Printf("Вы получите %.2f в валюте %s ", converter(), currency2)
+	convertionResult = currencyMap[currency2] * quantity
+
+	fmt.Printf("Вы получите %.2f в валюте %s ", convertionResult, currency2)
 
 }
 
-func getFirstCurrency() (string, error) {
+func getFirstCurrency() (map[string]float64, error) {
 	var input1 string
+	usdConvert := map[string]float64{"rub": 80.77, "eur": 0.896}
+	rubConvert := map[string]float64{"usd": 0.012, "eur": 0.011}
+	eurConvert := map[string]float64{"usd": 1.12, "rub": 90.2}
+
 	err := errors.New("Конвертируемая валюта введена с ошибкой")
 	fmt.Print("Введите валюту, которую хотите конвертировать: ")
 	fmt.Scan(&input1)
-	switch strings.ToLower(input1) {
+	input1 = strings.ToLower(input1)
+	switch input1 {
 	case "eur":
-		return input1, nil
+		return eurConvert, nil
 	case "usd":
-		return input1, nil
+		return usdConvert, nil
 	case "rub":
-		return input1, nil
+		return rubConvert, nil
 	default:
-		return "", err
+		return nil, err
 	}
 }
 
@@ -86,74 +90,22 @@ func getQuantutyFirstCurrency() (float64, error) {
 	return inputQuantity, nil
 }
 
-func availableSecondCurrency(currency string) string {
-	switch strings.ToLower(currency) {
-	case "eur":
-		return "Выберите usd или rub"
-	case "usd":
-		return "Выберите eur или rub"
-	case "rub":
-		return "Выберите usd или eur"
-	default:
-		return ""
+func availableSecondCurrency(currencyMap map[string]float64) {
+	for currency, _ := range currencyMap {
+		fmt.Println("Доступна валюта: ", currency)
 	}
 }
 
-func getSecondCurrency() (string, error) {
+func getSecondCurrency(currencyMap map[string]float64) (string, error) {
 	var input2 string
 	err := errors.New("Получаемая валюта введена с ошибкой")
 	fmt.Print("Введите валюту, которую хотите получить: ")
 	fmt.Scan(&input2)
-	if currency1 == "eur" {
-		switch strings.ToLower(input2) {
-		case "usd":
+	input2 = strings.ToLower(input2)
+	for currency, _ := range currencyMap {
+		if input2 == currency {
 			return input2, nil
-		case "rub":
-			return input2, nil
-		default:
-			return "", err
-		}
-	} else if currency1 == "usd" {
-		switch strings.ToLower(input2) {
-		case "eur":
-			return input2, nil
-		case "rub":
-			return input2, nil
-		default:
-			return "", err
-		}
-	} else {
-		switch strings.ToLower(input2) {
-		case "usd":
-			return input2, nil
-		case "eur":
-			return input2, nil
-		default:
-			return "", err
 		}
 	}
-}
-
-func converter() float64 {
-	var convertionResult float64
-	if currency1 == "usd" && currency2 == "rub" {
-		convertionResult = quantity * usdToRub
-		return convertionResult
-	} else if currency1 == "usd" && currency2 == "eur" {
-		convertionResult = quantity * usdToEur
-		return convertionResult
-	} else if currency1 == "rub" && currency2 == "usd" {
-		convertionResult = quantity / usdToRub
-		return convertionResult
-	} else if currency1 == "rub" && currency2 == "eur" {
-		convertionResult = quantity / usdToRub * usdToEur
-		return convertionResult
-	} else if currency1 == "eur" && currency2 == "usd" {
-		convertionResult = quantity / usdToEur
-		return convertionResult
-	} else {
-		convertionResult = quantity * eurTorub
-		return convertionResult
-	}
-
+	return "", err
 }
