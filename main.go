@@ -13,13 +13,14 @@ func main() {
 	fmt.Println("Доступные валюты: usd, eur, rub")
 
 	currencyMap := map[string]float64{}
+	currencyMapInd := &currencyMap
 	var currency2 string
 	var quantity float64
 	var convertionResult float64
 
 	for {
 		var err error
-		currencyMap, err = getFirstCurrency()
+		currencyMapInd, err = getFirstCurrency()
 		if err != nil {
 			fmt.Println(err)
 		} else {
@@ -29,7 +30,7 @@ func main() {
 
 	for {
 		var err error
-		quantity, err = getQuantityFirstCurrency()
+		quantity, err = getQuantutyFirstCurrency()
 		if err != nil {
 			fmt.Println(err)
 		} else {
@@ -38,11 +39,11 @@ func main() {
 		}
 	}
 
-	availableSecondCurrency(&currencyMap)
+	availableSecondCurrency(currencyMapInd)
 
 	for {
 		var err error
-		currency2, err = getSecondCurrency(&currencyMap)
+		currency2, err = getSecondCurrency(currencyMapInd)
 		if err != nil {
 			fmt.Println(err)
 		} else {
@@ -51,13 +52,14 @@ func main() {
 		}
 	}
 
+	currencyMap = *currencyMapInd
 	convertionResult = currencyMap[currency2] * quantity
 
 	fmt.Printf("Вы получите %.2f в валюте %s ", convertionResult, currency2)
 
 }
 
-func getFirstCurrency() (map[string]float64, error) {
+func getFirstCurrency() (*map[string]float64, error) {
 	var input1 string
 	usdConvert := map[string]float64{"rub": 80.77, "eur": 0.896}
 	rubConvert := map[string]float64{"usd": 0.012, "eur": 0.011}
@@ -69,17 +71,17 @@ func getFirstCurrency() (map[string]float64, error) {
 	input1 = strings.ToLower(input1)
 	switch input1 {
 	case "eur":
-		return eurConvert, nil
+		return &eurConvert, nil
 	case "usd":
-		return usdConvert, nil
+		return &usdConvert, nil
 	case "rub":
-		return rubConvert, nil
+		return &rubConvert, nil
 	default:
 		return nil, err
 	}
 }
 
-func getQuantityFirstCurrency() (float64, error) {
+func getQuantutyFirstCurrency() (float64, error) {
 	var inputQuantity float64
 	err := errors.New("Количество валюты введено с ошибкой")
 	fmt.Print("Введите количество конвертируемой валюты: ")
